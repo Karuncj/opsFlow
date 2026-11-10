@@ -1,11 +1,11 @@
 
 package com.opsflow.application_service.controller;
 
-import com.opsflow.application_service.entity.ApplicationEntity;
+import com.opsflow.application_service.dto.ApplicationRequest;
+import com.opsflow.application_service.dto.ApplicationResponse;
 import com.opsflow.application_service.service.ApplicationService;
 
 import jakarta.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,41 +28,35 @@ public class ApplicationController {
     }
 
     @PostMapping
-    public ResponseEntity<ApplicationEntity> createApplication(
-            @Valid @RequestBody ApplicationEntity application) {
+    public ResponseEntity<ApplicationResponse> createApplication(
+            @Valid @RequestBody ApplicationRequest request) {
 
-        ApplicationEntity savedApplication =
-                applicationService.createApplication(application);
+        ApplicationResponse response =
+                applicationService.createApplication(request);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(savedApplication);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public List<ApplicationEntity> getAllApplications() {
+    public List<ApplicationResponse> getAllApplications() {
         return applicationService.getAllApplications();
     }
 
     @GetMapping("/{id}")
-    public ApplicationEntity getApplicationById(
-            @PathVariable Long id) {
-
+    public ApplicationResponse getApplicationById(@PathVariable Long id) {
         return applicationService.getApplicationById(id);
     }
 
     @PutMapping("/{id}")
-    public ApplicationEntity updateApplication(
+    public ApplicationResponse updateApplication(
             @PathVariable Long id,
-            @Valid @RequestBody ApplicationEntity updatedApplication) {
+            @Valid @RequestBody ApplicationRequest request) {
 
-        return applicationService.updateApplication(
-                id, updatedApplication);
+        return applicationService.updateApplication(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteApplication(
-            @PathVariable Long id) {
+    public ResponseEntity<Void> deleteApplication(@PathVariable Long id) {
 
         applicationService.deleteApplication(id);
 

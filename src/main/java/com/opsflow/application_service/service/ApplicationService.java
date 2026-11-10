@@ -1,5 +1,8 @@
+
 package com.opsflow.application_service.service;
 
+import com.opsflow.application_service.dto.ApplicationRequest;
+import com.opsflow.application_service.dto.ApplicationResponse;
 import com.opsflow.application_service.entity.ApplicationEntity;
 import com.opsflow.application_service.exception.ApplicationNotFoundException;
 import com.opsflow.application_service.repository.ApplicationRepository;
@@ -16,38 +19,78 @@ public class ApplicationService {
         this.applicationRepository = applicationRepository;
     }
 
-    public ApplicationEntity createApplication(ApplicationEntity application) {
-        return applicationRepository.save(application);
+    public ApplicationResponse createApplication(ApplicationRequest request) {
+
+        ApplicationEntity application = new ApplicationEntity(
+                request.name(),
+                request.team(),
+                request.environment(),
+                request.version(),
+                request.status()
+        );
+
+        ApplicationEntity saved = applicationRepository.save(application);
+
+        return mapToResponse(saved);
     }
 
-    public List<ApplicationEntity> getAllApplications() {
-        return applicationRepository.findAll();
+    public List<ApplicationResponse> getAllApplications() {
+
+        return applicationRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
-    public ApplicationEntity getApplicationById(Long id) {
-        return applicationRepository.findById(id)
-                .orElseThrow(() ->
-                        new ApplicationNotFoundException(
-                                "Application not found with id: " + id));
+    public ApplicationResponse getApplicationById(Long id) {
+
+        ApplicationEntity application = findApplication(id);
+
+        return mapToResponse(application);
     }
 
-    public ApplicationEntity updateApplication(Long id, ApplicationEntity updatedApplication) {
+    public ApplicationResponse updateApplication(
+            Long id, ApplicationRequest request) {
 
-        ApplicationEntity existingApplication = getApplicationById(id);
+        ApplicationEntity existing = findApplication(id);
 
-        existingApplication.setName(updatedApplication.getName());
-        existingApplication.setTeam(updatedApplication.getTeam());
-        existingApplication.setEnvironment(updatedApplication.getEnvironment());
-        existingApplication.setVersion(updatedApplication.getVersion());
-        existingApplication.setStatus(updatedApplication.getStatus());
+        existing.setName(request.name());
+        existing.setTeam(request.team());
+        existing.setEnvironment(request.environment());
+        existing.setVersion(request.version());
+        existing.setStatus(request.status());
 
-        return applicationRepository.save(existingApplication);
+        ApplicationEntity updated = applicationRepository.save(existing);
+
+        return mapToResponse(updated);
     }
 
     public void deleteApplication(Long id) {
 
-        ApplicationEntity existingApplication = getApplicationById(id);
+        ApplicationEntity existing = findApplication(id);
 
-        applicationRepository.delete(existingApplication);
+        applicationRepository.delete(existing);
+    }
+
+    private ApplicationEntity findApplication(Long id) {
+
+        return applicationRepository.findById(id)
+                .orElseThrow(() ->
+                        new ApplicationNotFoundException(
+                                "Application not found with id: " + id
+                        )
+                );
+    }
+
+    private ApplicationResponse mapToResponse(ApplicationEntity entity) {
+
+        return new ApplicationResponse(
+                entity.getId(),
+                entity.getName(),
+                entity.getTeam(),
+                entity.getEnvironment(),
+                entity.getVersion(),
+                entity.getStatus()
+        );
     }
 }
