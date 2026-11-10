@@ -1,6 +1,10 @@
+
 package com.opsflow.application_service.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "applications")
@@ -10,22 +14,37 @@ public class ApplicationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Application name cannot be blank")
+    @Size(max = 100, message = "Application name cannot exceed 100 characters")
     private String name;
 
+    @NotBlank(message = "Team cannot be blank")
+    @Size(max = 100, message = "Team name cannot exceed 100 characters")
     private String team;
 
+    @NotBlank(message = "Environment cannot be blank")
+    @Pattern(
+            regexp = "DEV|QA|STAGING|PROD",
+            message = "Environment must be DEV, QA, STAGING or PROD"
+    )
     private String environment;
 
+    @NotBlank(message = "Version cannot be blank")
     private String version;
 
+    @NotBlank(message = "Status cannot be blank")
+    @Pattern(
+            regexp = "RUNNING|STOPPED|MAINTENANCE",
+            message = "Status must be RUNNING, STOPPED or MAINTENANCE"
+    )
     private String status;
 
-    // Required by JPA/Hibernate
     public ApplicationEntity() {
     }
 
-    public ApplicationEntity(String name, String team, String environment,
-                             String version, String status) {
+    public ApplicationEntity(String name, String team,
+                             String environment, String version,
+                             String status) {
         this.name = name;
         this.team = team;
         this.environment = environment;
@@ -35,9 +54,6 @@ public class ApplicationEntity {
 
     public Long getId() {
         return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

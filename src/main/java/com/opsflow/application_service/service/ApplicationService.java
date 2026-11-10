@@ -1,6 +1,7 @@
 package com.opsflow.application_service.service;
 
 import com.opsflow.application_service.entity.ApplicationEntity;
+import com.opsflow.application_service.exception.ApplicationNotFoundException;
 import com.opsflow.application_service.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,8 @@ public class ApplicationService {
     public ApplicationEntity getApplicationById(Long id) {
         return applicationRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Application not found with id: " + id));
+                        new ApplicationNotFoundException(
+                                "Application not found with id: " + id));
     }
 
     public ApplicationEntity updateApplication(Long id, ApplicationEntity updatedApplication) {
