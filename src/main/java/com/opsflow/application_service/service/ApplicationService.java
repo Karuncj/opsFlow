@@ -6,28 +6,27 @@ import com.opsflow.application_service.dto.ApplicationResponse;
 import com.opsflow.application_service.entity.ApplicationEntity;
 import com.opsflow.application_service.exception.ApplicationNotFoundException;
 import com.opsflow.application_service.repository.ApplicationRepository;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
 
-    public ApplicationService(ApplicationRepository applicationRepository) {
-        this.applicationRepository = applicationRepository;
-    }
-
     public ApplicationResponse createApplication(ApplicationRequest request) {
 
-        ApplicationEntity application = new ApplicationEntity(
-                request.name(),
-                request.team(),
-                request.environment(),
-                request.version(),
-                request.status()
-        );
+        ApplicationEntity application = new ApplicationEntity();
+
+        application.setName(request.name());
+        application.setTeam(request.team());
+        application.setEnvironment(request.environment());
+        application.setVersion(request.version());
+        application.setStatus(request.status());
 
         ApplicationEntity saved = applicationRepository.save(application);
 
